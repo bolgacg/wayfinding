@@ -391,7 +391,7 @@
   function drawRecovery() {
     var host = $('#recviz'); if (!host) return;
     var sw = D.recovery.sweep;
-    var W = 860, H = 300, P = { l: 58, r: 20, t: 18, b: 44 };
+    var W = 860, H = 300, P = { l: 62, r: 48, t: 18, b: 44 };
     var s = el('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img',
       'aria-label': 'How well the fitter recovers known numbers as the number of days grows' });
     var maxD = sw[sw.length - 1].days;
@@ -402,8 +402,9 @@
       s.appendChild(el('text', { x: P.l - 8, y: Y(g) + 4, 'text-anchor': 'end',
         'font-family': "'IBM Plex Mono',monospace", 'font-size': 10, fill: '#8b95a1' }, pct(g)));
     }
-    sw.forEach(function (r) {
-      s.appendChild(el('text', { x: X(r.days), y: H - P.b + 16, 'text-anchor': 'middle',
+    sw.forEach(function (r, i) {
+      var anchor = i === 0 ? 'start' : i === sw.length - 1 ? 'end' : 'middle';
+      s.appendChild(el('text', { x: X(r.days), y: H - P.b + 16, 'text-anchor': anchor,
         'font-family': "'IBM Plex Mono',monospace", 'font-size': 10.5, fill: '#8b95a1' }, r.days + ' days'));
     });
     [['alpha_pinned_share', '#b03a3a'], ['beta_pinned_share', '#2c4a6b']].forEach(function (k) {
@@ -420,8 +421,10 @@
       s.appendChild(el('text', { x: X(here.days) + 7, y: P.t + 12, 'font-family': "'IBM Plex Sans',sans-serif",
         'font-size': 11.5, fill: '#1a1d21' }, 'this page'));
     }
-    s.appendChild(el('text', { x: 14, y: P.t + 4, 'font-family': "'IBM Plex Sans',sans-serif", 'font-size': 11.5,
-      fill: '#5b6470', transform: 'rotate(-90 14 ' + (P.t + 4) + ')' }, 'share of people whose number is pinned down'));
+    var yl = H / 2;
+    s.appendChild(el('text', { x: 14, y: yl, 'text-anchor': 'middle', 'font-family': "'IBM Plex Sans',sans-serif",
+      'font-size': 11.5, fill: '#5b6470', transform: 'rotate(-90 14 ' + yl + ')' },
+      'share of people whose number is pinned down'));
     s.appendChild(el('text', { x: P.l, y: H - 6, 'font-family': "'IBM Plex Sans',sans-serif", 'font-size': 11.5, fill: '#5b6470' },
       'Days of commuting per person, on a logarithmic scale'));
     host.innerHTML = '';
