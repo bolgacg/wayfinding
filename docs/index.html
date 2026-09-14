@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What do you do when the route you know is closed?</title>
+<meta name="description" content="A two-minute navigation experiment on the real DTU Lyngby footpath network, fitted in your own browser, with an honest account of what fourteen days of data can and cannot measure. Bolgac Gulen, 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{--paper:#faf9f7;--ink:#1a1d21;--soft:#5b6470;--faint:#8b95a1;--rule:#e2e0dc;--rule2:#c9c5be;--panel:#f3f1ed;--card:#fff;
+  --pos:#2f7d54;--neg:#b03a3a;--accent:#2c4a6b;--amber:#c8860d;--s1:#2a78d6;--s2:#eb6834;
+  --serif:'Newsreader',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding-bottom:110px}
+a{color:var(--accent);text-decoration:none;font-weight:500}a:hover{text-decoration:underline}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header{padding:48px 0 30px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.01em;margin:12px 0 14px;max-width:820px;text-wrap:balance}
+.dek{max-width:760px;color:var(--soft);font-size:18.5px;font-family:var(--serif);line-height:1.5}
+.dek strong{color:var(--ink);font-weight:600}
+.byline{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--faint);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+section{padding:44px 0 6px}
+.sec-label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+h2{font-family:var(--serif);font-weight:600;font-size:29px;line-height:1.2;margin-bottom:10px;text-wrap:balance}
+h3{font-family:var(--serif);font-size:20px;font-weight:600}
+p{margin-bottom:12px}
+.lede{color:var(--soft);max-width:760px;margin-bottom:20px}
+.lede strong,.lede em{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:22px 24px;margin-top:16px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:12px;padding:6px 12px;border:1px solid var(--rule2);border-radius:3px;background:var(--card);color:var(--soft);cursor:pointer}
+.chip:hover{color:var(--ink);border-color:var(--soft)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:500}
+.viz{position:relative}.viz svg{width:100%;height:auto;display:block}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font:12px var(--mono);padding:6px 8px;border-radius:4px;display:none;white-space:nowrap;z-index:5}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--soft);margin:6px 0 0 4px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:16px;height:0;border-top:2px solid;display:inline-block}
+.legend i.bar{height:10px;border:0;width:12px}
+.verdict{margin-top:16px;padding:2px 0 2px 16px;border-left:3px solid var(--accent);font-size:15px;max-width:760px}
+.verdict.sting{border-left-color:var(--neg)}.verdict b{color:var(--accent)}.verdict.sting b{color:var(--neg)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);text-align:right;padding:0 0 8px;border-bottom:1px solid var(--rule)}
+th:first-child{text-align:left}
+td{padding:8px 0;border-bottom:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums;vertical-align:top}
+td:first-child{text-align:left}td.l{text-align:left}th+th,td+td{padding-left:14px}td.num{white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.tscroll{overflow-x:auto}
+.note{font-size:12.5px;color:var(--faint);margin-top:10px;line-height:1.5}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.hint{font-size:12px;color:var(--faint);line-height:1.45}
+code{font-family:var(--mono);font-size:12.5px}
+.quote{font-family:var(--serif);font-size:17px;color:var(--ink);border-left:3px solid var(--amber);padding:2px 0 2px 16px;margin:14px 0;max-width:760px}
+.quote small{display:block;font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:6px}
+.limits{margin-top:22px;border-left:3px solid var(--neg);padding:2px 0 2px 16px;max-width:760px}
+.limits p{font-size:14px;color:var(--soft)}
+.small{font-size:13.5px;color:var(--soft)}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px 24px;font-size:13px;color:var(--soft);margin-top:10px}
+.gloss b{color:var(--ink);font-family:var(--mono);font-size:12px;font-weight:500}
+footer{border-top:1px solid var(--rule);margin-top:44px;padding:20px 0 30px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+#tour{position:absolute;top:0;left:0;right:0;z-index:50;display:none;pointer-events:none}
+#tour.on{display:block}
+.tour-hl{position:absolute;border:2px solid var(--accent);border-radius:8px;box-shadow:0 0 0 9999px rgba(26,29,33,.55);transition:all .35s ease;pointer-events:none}
+.tour-card{position:absolute;width:min(400px,calc(100vw - 32px));background:var(--card);border:1px solid var(--rule2);border-radius:8px;padding:18px 20px;box-shadow:0 6px 30px rgba(0,0,0,.18);pointer-events:auto}
+.tour-card .tk{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.tour-card p{font-size:14px;line-height:1.55;color:var(--ink);margin:0 0 12px}
+.tour-nav{display:flex;align-items:center;gap:8px}
+.tour-nav .dots{flex:1;display:flex;gap:5px}
+.tour-nav .dots i{width:6px;height:6px;border-radius:50%;background:var(--rule2)}
+.tour-nav .dots i.on{background:var(--accent)}
+.tour-btn{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:4px;border:1px solid var(--rule2);background:var(--card);color:var(--soft);cursor:pointer}
+.tour-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.tour-open{font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:4px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer}
+.tour-open:hover{background:var(--accent);color:#fff}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-top:14px}
+.stat>div{padding:12px 14px;border-left:1px solid var(--rule)}.stat>div:first-child{border-left:none}
+.stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.stat .n{font-family:var(--mono);font-size:20px;font-weight:500}.stat .s{font-size:11.5px;color:var(--soft);margin-top:3px}
+.howto{font-size:13px;color:var(--soft);margin:8px 0 0;line-height:1.5}
+.howto b{color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
+.card-title{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:4px}
+.pill{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--rule2);border-radius:3px;padding:3px 7px;color:var(--soft);white-space:nowrap;margin-left:6px}
+.pill.bad{color:var(--neg);border-color:var(--neg)}
+.pill.ok{color:var(--pos);border-color:var(--pos)}
+.pill.mid{color:var(--amber);border-color:var(--amber)}
+.why{font-size:14.5px;color:var(--ink);background:var(--panel);border-radius:4px;padding:10px 14px;margin:0 0 12px}
+.why b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-right:6px}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin:18px 0 6px;max-width:880px}
+.qgrid div{border-top:1px solid var(--rule);padding-top:8px;font-size:14.5px;line-height:1.5;color:var(--soft)}
+.qgrid b{display:block;font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:600;margin-bottom:2px}
+@media (max-width:640px){.qgrid{grid-template-columns:1fr}}
+.slider{width:100%;max-width:520px;accent-color:var(--accent)}
+.rowsel{cursor:pointer}
+.rowsel:hover td{background:var(--panel)}
+tr.on td{background:#eef2f7}
+.mono{font-family:var(--mono)}
+.flex{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.grow{flex:1;min-width:280px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.mapwrap{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:10px}
+.mapwrap svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.rt{cursor:pointer}
+.rt path.hit{stroke:transparent;stroke-width:22;fill:none}
+.rt path.line{fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke-width .12s}
+.rt:hover path.line{stroke-width:7}
+.rt.sel path.line{stroke-width:8}
+.rt.off path.line{stroke:#9aa3ad;stroke-dasharray:9 7;stroke-width:3.5}
+.rt.off{cursor:not-allowed}
+.daybar{display:flex;gap:3px;flex-wrap:wrap;margin:10px 0 0}
+.daybar i{width:20px;height:20px;border-radius:3px;background:var(--panel);border:1px solid var(--rule);
+  font:10px var(--mono);display:flex;align-items:center;justify-content:center;color:var(--faint);font-style:normal}
+.daybar i.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.daybar i.now{border-color:var(--ink);color:var(--ink);font-weight:600}
+.daybar i.shut{background:#f6e7e7;border-color:var(--neg);color:var(--neg)}
+.bigbtn{font-family:var(--mono);font-size:13px;padding:10px 18px;border-radius:4px;border:1px solid var(--accent);
+  background:var(--accent);color:#fff;cursor:pointer}
+.bigbtn.ghost{background:var(--card);color:var(--accent)}
+.bigbtn:disabled{opacity:.45;cursor:default}
+.readout{font-family:var(--mono);font-size:13px;color:var(--soft);margin-top:8px;min-height:1.5em}
+.fitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+.fitbox{background:var(--panel);border-radius:5px;padding:12px 14px}
+.fitbox .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.fitbox .n{font-family:var(--mono);font-size:22px;font-weight:500;margin:4px 0 2px}
+.fitbox .s{font-size:12px;color:var(--soft);line-height:1.45}
+</style>
+</head>
+<body>
+<div id="tour"><div class="tour-hl"></div><div class="tour-card"></div></div>
+
+<header><div class="wrap">
+  <div class="eyebrow">Work sample &middot; for DTU Management &middot; September 2026</div>
+  <h1>What do you do when the route you know is closed?</h1>
+  <p class="dek" id="dek">Loading.</p>
+  <div class="byline">
+    <span>Bolga&ccedil; G&uuml;len</span>
+    <span>OpenStreetMap, DTU Lyngby</span>
+    <a href="https://github.com/bolgacg/wayfinding">github.com/bolgacg/wayfinding</a>
+    <button class="tour-open" id="tourbtn">Walk me through it</button>
+  </div>
+</div></header>
+
+<section id="primer"><div class="wrap">
+  <div class="sec-label">Before anything else</div>
+  <h2>Five things to know</h2>
+  <p class="lede">This page is a small experiment that runs on you, so here is what it does before
+  it does it.</p>
+  <div class="card">
+    <ol class="small" style="padding-left:18px;line-height:1.75">
+      <li>You will walk the same trip across the DTU Lyngby campus fourteen times, one day at a
+        time, choosing between three real footpath routes drawn from OpenStreetMap.</li>
+      <li>Each route has a true walking time you are not shown. You learn it only by walking it,
+        and only the route you took reports back, which is the situation a person is actually in.</li>
+      <li>On one of the days a path closes without warning, and the route you have settled into
+        stops being available.</li>
+      <li>At the end, the page fits two numbers to your fourteen choices: <b>how fast you update a
+        belief</b> after one walk, and <b>how decisively you act</b> on the belief you hold.</li>
+      <li>Then it tells you how much those two numbers are worth, by having already run the same
+        fit on hundreds of simulated people whose numbers were known. That part is the reason the
+        page exists.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Nothing you do here leaves your browser</div>
+    <p class="small">There is no server, no upload, no analytics and no storage. The fit runs in
+    your own machine and disappears when you close the tab. That is also why the page cannot pool
+    across visitors, which is a real limitation and not a virtue.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Terms, in the order they appear</div>
+    <div class="gloss">
+      <div><b>route</b> One of three ways across campus, each a real chain of footpaths.</div>
+      <div><b>belief</b> What you currently think a route costs in minutes. It starts at what the
+        map implies and moves when you walk.</div>
+      <div><b>learning rate</b> How much of the difference between what you expected and what you
+        got is absorbed after one walk. Zero means you never update; one means you replace your
+        belief with the last walk.</div>
+      <div><b>decisiveness</b> How strongly a small difference in belief turns into always picking
+        the better route. Low means you wander; high means you commit.</div>
+      <div><b>recovery</b> Feeding the fitter data from an agent whose numbers are known, to see
+        whether it gets them back. If it cannot, the number it gives you means little.</div>
+      <div><b>stable preference</b> The assumption that a person has a fixed ranking of routes that
+        does not move with experience. It is the assumption this project exists to question.</div>
+    </div>
+  </div>
+</div></section>
+
+<section id="words"><div class="wrap">
+  <div class="sec-label">Their words</div>
+  <h2>The sentence this page is built on</h2>
+  <p class="lede">The advertisement for the Brains in Motion scholarship states the gap plainly, and
+  the whole of this page is one small attempt at the thing it asks for.</p>
+  <div class="quote">Navigating modern cities is a complex and cognitively demanding task. People
+    continuously learn, adapt and update their behaviours [...] Yet, current models of navigation
+    and route choice often assume stable preferences and near-perfect knowledge of the environment.
+    As a result, they provide limited insights into how people learn to move through cities over
+    time.
+    <small>DTU Management, PhD scholarship 7860, Human Navigation, Artificial Intelligence and
+      Neuroscience, read 24 August 2026</small></div>
+  <p class="small">So this experiment withholds knowledge of the environment on purpose, forces
+  preferences to move, and then measures whether the moving can be detected at all from the amount
+  of data a real study would collect. Act four fits the stable-preference model to your own choices
+  and shows what it concludes about you, which is the concrete version of the complaint above.</p>
+  <p class="note">Scope, stated plainly. This is a route-choice experiment with fourteen trials and
+  one participant. It is not a study of wayfinding in the sense of finding your way when you are
+  lost, it collects no eye movements and no physiological signal, and nothing here has been through
+  an ethics committee, which is why it takes no data off your machine.</p>
+</div></section>
+
+<section id="act1"><div class="wrap">
+  <div class="sec-label">Act one</div>
+  <h2>Fourteen days across campus</h2>
+  <p class="why"><b>Why this matters</b> Every number later on the page comes from what you do in
+  this box. It takes about two minutes.</p>
+  <p class="lede">You are at <b id="startname">the start</b> and you need to get to
+  <b id="goalname">the goal</b>. Three routes, drawn from the real footpath network. Pick one for
+  today. You will be told how long it took, and only for the route you chose.</p>
+  <p class="howto"><b>Click a route</b> on the map, or the button under it. The clock starts when
+  the day begins, because how long you take to decide is part of what is measured.</p>
+  <div class="mapwrap" id="mapwrap">
+    <div id="map"></div>
+    <div class="chips" id="routebtns" role="group" aria-label="Choose today's route" style="margin-top:10px"></div>
+    <div class="daybar" id="daybar"></div>
+    <div class="readout" id="readout">Press begin.</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="bigbtn" id="begin">Begin day 1</button>
+      <button class="bigbtn ghost" id="reset" hidden>Start again</button>
+      <button class="bigbtn ghost" id="skip" hidden>Fill the rest in for me</button>
+    </div>
+  </div>
+  <div class="legend" id="maplegend"></div>
+  <div class="verdict" id="v1"></div>
+</div></section>
+
+<section id="act2"><div class="wrap">
+  <div class="sec-label">Act two</div>
+  <h2>What those fourteen choices say about you</h2>
+  <p class="why"><b>Why this matters</b> This is the model the project is about: beliefs that move
+  with experience rather than preferences fixed in advance.</p>
+  <p class="lede">The fit searches a grid of learning rates and decisiveness values for the pair
+  that makes your actual sequence of choices most likely. The chart underneath shows what your
+  beliefs did, day by day, under the best-fitting pair.</p>
+  <div class="card" id="fitcard"><p class="small">Finish act one and this fills in.</p></div>
+  <div class="verdict" id="v2"></div>
+</div></section>
+
+<section id="act3"><div class="wrap">
+  <div class="sec-label">Act three</div>
+  <h2>What fourteen days can actually carry</h2>
+  <p class="why"><b>Why this matters</b> Two numbers were just printed next to your name. This act
+  is about whether they mean anything, and it was run before you arrived.</p>
+  <p class="lede">Simulated people with known learning rates and known decisiveness walked exactly
+  this experiment, and exactly this fitter was asked to recover their numbers. The answer decides
+  how much weight your own fit can bear.</p>
+  <div class="viz" id="recviz"></div>
+  <div class="legend" id="reclegend"></div>
+  <div class="stat" id="recstat"></div>
+  <p class="howto" style="margin-top:14px"><b>Read the curve</b> as the answer to "how many days
+  would a real study need". The marked point is where this page sits.</p>
+  <div class="verdict sting" id="v3"></div>
+</div></section>
+
+<section id="act4"><div class="wrap">
+  <div class="sec-label">Act four</div>
+  <h2>What a stable-preference model concludes about you</h2>
+  <p class="why"><b>Why this matters</b> This is the advertisement's complaint, made into a number
+  on your own data.</p>
+  <p class="lede">The same fit is run again with learning switched off, so beliefs never move from
+  what the map implied. If that version explains your choices about as well as the learning one,
+  then fourteen days of one person cannot tell the two apart, whatever is true of the person.</p>
+  <div class="card" id="cmpcard"><p class="small">Finish act one and this fills in.</p></div>
+  <div class="verdict" id="v4"></div>
+</div></section>
+
+<section id="coda"><div class="wrap">
+  <div class="sec-label">How it was built</div>
+  <h2>Method, limits and sources</h2>
+
+  <div class="card" id="selfcheckcard">
+    <div class="card-title">This page checking its own fitter</div>
+    <p class="small">The recovery study was run in Python and the live fit runs in JavaScript, so
+    the two could disagree without anyone noticing. The Python run therefore shipped one worked
+    example with its answer, and the browser refits it on load.</p>
+    <p class="small" id="selfcheck">Running.</p>
+  </div>
+
+  <h3>The map</h3>
+  <p class="small" id="maptext"></p>
+
+  <h3>The model that is fitted</h3>
+  <p class="small">Each route carries a believed time, starting at its length divided by a plain
+  walking speed of 1.35 metres per second, which is what a map alone would let you guess. After a
+  walk, the belief for the route you took moves toward what you observed by the learning rate, and
+  no other belief moves, because you learned nothing about routes you did not take. A choice is
+  drawn from a softmax over the negative believed times, with decisiveness as its scale. Both
+  numbers are found by searching a grid for the maximum likelihood of your actual choices. The
+  ranges quoted beside them are every grid value within two log-likelihood units of the best, which
+  is the usual rule of thumb for a value that is not meaningfully worse.</p>
+  <p class="small">Response time is recorded but is not fitted. Combining choice with response time
+  properly needs a sequential sampling model, which is the kind of model Rico Krueger's own work
+  builds, and fourteen trials from one person cannot support one. Act three is the evidence for that
+  claim rather than an excuse for it: if fourteen trials cannot pin two parameters, they will not
+  carry five.</p>
+
+  <div class="limits">
+    <h3>Limits, stated before you find them</h3>
+    <p id="lim1"></p>
+    <p>One participant, one trip, one campus. Nothing here generalises to a population, and the page
+      cannot pool across visitors because it deliberately keeps your data on your machine.</p>
+    <p>The true walking times are not measured in the field. They come from real path lengths and
+      real path types, with a hidden per-segment friction drawn once from a seeded distribution to
+      stand for what a map cannot show. The learning problem is therefore real and the minutes are
+      plausible, but they are not observations of anybody walking.</p>
+    <p>Choosing between three routes laid out on a map is not the same act as finding your way
+      through a city while moving. It is the part of the problem that fits in two minutes in a
+      browser, and the distance between the two is the reason this is a work sample and not a
+      finding.</p>
+  </div>
+
+  <h3 style="margin-top:26px">Sources</h3>
+  <ul class="small" style="padding-left:18px;line-height:1.8">
+    <li>Footpaths, buildings and their names: OpenStreetMap contributors, queried through Overpass,
+      14 September 2026. Licensed under the Open Database License.</li>
+    <li>The advertisement for PhD scholarship 7860, DTU Management, read 24 August 2026.</li>
+    <li>Code, the recovery study and this page: <a href="https://github.com/bolgacg/wayfinding">github.com/bolgacg/wayfinding</a>.</li>
+  </ul>
+</div></section>
+
+<footer><div class="wrap">
+  <span>Bolga&ccedil; G&uuml;len &middot; every number on this page is computed from the map data and from your own choices, not typed</span>
+  <a href="https://github.com/bolgacg/wayfinding">github.com/bolgacg/wayfinding</a>
+</div></footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
