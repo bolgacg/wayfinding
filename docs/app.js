@@ -95,10 +95,37 @@
     };
   }
 
+  // An edge's geom is stored in the direction the way was drawn in OpenStreetMap,
+  // which is not the direction a route walks it. Emitting it as stored sent the pen
+  // to the far end of every edge entered from its b side, drew that segment
+  // backwards and jumped back, which is what made the routes double back on
+  // themselves. The node ids say which way the walk goes, so orient by them: no
+  // distance guess, and the join between two edges is exact by construction.
+  function routeNodes(ri) {
+    var ids = D.routes[ri].edges;
+    if (!ids.length) return [];
+    var first = D.edges[ids[0]];
+    var at;
+    if (ids.length === 1) {
+      at = first.a;
+    } else {
+      var second = D.edges[ids[1]];
+      // The first edge starts at whichever of its ends the second edge does NOT touch.
+      at = (first.b === second.a || first.b === second.b) ? first.a : first.b;
+    }
+    return ids.map(function (ei) {
+      var e = D.edges[ei], forward = e.a === at;
+      at = forward ? e.b : e.a;
+      return { e: e, forward: forward };
+    });
+  }
+
   function routePath(ri) {
     var pts = [];
-    D.routes[ri].edges.forEach(function (ei) {
-      D.edges[ei].geom.forEach(function (p) { pts.push(proj(p[0], p[1])); });
+    routeNodes(ri).forEach(function (step, k) {
+      var g = step.forward ? step.e.geom : step.e.geom.slice().reverse();
+      // The shared node is the previous edge's last point, so skip it.
+      g.forEach(function (p, i) { if (k === 0 || i > 0) pts.push(proj(p[0], p[1])); });
     });
     return pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
   }

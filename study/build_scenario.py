@@ -179,6 +179,11 @@ def main() -> int:
             "geom": src_e["geom"],
             "true_s": true_time[e],
             "name": src_e.get("name"),
+            # The node ids at each end. geom is stored in the way's own direction,
+            # which is not the direction a route traverses it, so the page needs
+            # these to draw each edge the way the walk actually goes.
+            "a": src_e["a"],
+            "b": src_e["b"],
         })
 
     # The rest of the campus footpaths around the three routes, so the map shows
