@@ -51,11 +51,34 @@
     });
     var okA = ALPHA_GRID.filter(function (a) { return loglik(trials, a, best.beta) > best.ll - 2; });
     var okB = BETA_GRID.filter(function (b) { return loglik(trials, best.alpha, b) > best.ll - 2; });
+    // A fit that lands on the first or last value of its grid is censored: the search
+    // never looked past that point, so the number is a bound and not an estimate. The
+    // same goes for an interval whose end is the end of the grid. Saying so is the
+    // difference between reporting a measurement and reporting where the search stopped.
+    var edge = function (v, grid) {
+      if (v === grid[0]) return 'low';
+      if (v === grid[grid.length - 1]) return 'high';
+      return null;
+    };
     return {
       alpha: best.alpha, beta: best.beta, loglik: best.ll,
       alpha_range: [Math.min.apply(null, okA), Math.max.apply(null, okA)],
-      beta_range: [Math.min.apply(null, okB), Math.max.apply(null, okB)]
+      beta_range: [Math.min.apply(null, okB), Math.max.apply(null, okB)],
+      alpha_edge: edge(best.alpha, ALPHA_GRID), beta_edge: edge(best.beta, BETA_GRID),
+      alpha_open: [Math.min.apply(null, okA) === ALPHA_GRID[0],
+                   Math.max.apply(null, okA) === ALPHA_GRID[ALPHA_GRID.length - 1]],
+      beta_open: [Math.min.apply(null, okB) === BETA_GRID[0],
+                  Math.max.apply(null, okB) === BETA_GRID[BETA_GRID.length - 1]]
     };
+  }
+
+  // "0.36, and the search stopped there" rather than a bare 0.36.
+  function edgeNote(edge, open, unitLow, unitHigh) {
+    if (edge === 'high') return ' The search stopped at ' + unitHigh + ', so read this as at least that, not as a measurement.';
+    if (edge === 'low') return ' The search stopped at ' + unitLow + ', so read this as at most that, not as a measurement.';
+    if (open && open[1]) return ' The upper end of that range is the end of the search, so it is open above.';
+    if (open && open[0]) return ' The lower end of that range is the end of the search, so it is open below.';
+    return '';
   }
 
   function fitNoLearning(trials) {
@@ -329,12 +352,18 @@
     var card = $('#fitcard');
     card.innerHTML =
       '<div class="fitgrid">' +
-      '<div class="fitbox"><div class="k">Learning rate</div><div class="n">' + f.alpha.toFixed(2) +
+      '<div class="fitbox"><div class="k">Learning rate</div><div class="n">' +
+      (f.alpha_edge ? (f.alpha_edge === 'high' ? '\u2265 ' : '\u2264 ') : '') + f.alpha.toFixed(2) +
       '</div><div class="s">Every value from ' + f.alpha_range[0].toFixed(2) + ' to ' + f.alpha_range[1].toFixed(2) +
-      ' fits your choices about as well.</div></div>' +
-      '<div class="fitbox"><div class="k">Decisiveness</div><div class="n">' + f.beta.toFixed(3) +
+      ' fits your choices about as well.' +
+      edgeNote(f.alpha_edge, f.alpha_open, ALPHA_GRID[0].toFixed(2),
+               ALPHA_GRID[ALPHA_GRID.length - 1].toFixed(2)) + '</div></div>' +
+      '<div class="fitbox"><div class="k">Decisiveness</div><div class="n">' +
+      (f.beta_edge ? (f.beta_edge === 'high' ? '\u2265 ' : '\u2264 ') : '') + f.beta.toFixed(3) +
       '</div><div class="s">Anything from ' + f.beta_range[0].toFixed(3) + ' to ' + f.beta_range[1].toFixed(3) +
-      ' fits about as well, a factor of ' + (f.beta_range[1] / Math.max(f.beta_range[0], 1e-9)).toFixed(1) + '.</div></div>' +
+      ' fits about as well, a factor of ' + (f.beta_range[1] / Math.max(f.beta_range[0], 1e-9)).toFixed(1) + '.' +
+      edgeNote(f.beta_edge, f.beta_open, BETA_GRID[0].toFixed(3),
+               BETA_GRID[BETA_GRID.length - 1].toFixed(3)) + '</div></div>' +
       '<div class="fitbox"><div class="k">Best route found</div><div class="n">' +
       (function () {
         var after = state.trials.filter(function (t) { return t.day > D.closure_day; });
@@ -498,7 +527,12 @@
       '; this browser just fitted ' + got.alpha + ' and ' + got.beta + '. ' +
       (same
         ? 'Worth noticing on its own: the fitted decisiveness there is off from the truth by a factor of ' +
-          (ex.fit.beta / ex.true_beta).toFixed(0) + ', which is act three in one line.'
+          (ex.fit.beta / ex.true_beta).toFixed(0) + ', which is act three in one line. ' +
+          (ex.fit.beta === BETA_GRID[BETA_GRID.length - 1]
+            ? 'And it sits exactly on the last value the search tried, ' +
+              BETA_GRID[BETA_GRID.length - 1].toFixed(5) + ', so it is a lower bound rather than an ' +
+              'estimate: the true value could be anywhere above it and this fit could not tell.'
+            : '')
         : 'The two fitters disagree, so nothing on this page should be believed until that is fixed.');
   }
 
